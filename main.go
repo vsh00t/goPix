@@ -12,8 +12,10 @@ import (
 	_ "github.com/mattn/go-sqlite3" // sqlite3 driver
 )
 
-var domain = "google.com"
-var d string
+//var domain = "sygma-ec.com"
+var domain string
+var subdomain string
+var port string
 
 func nslookup(host string) {
 	a, _ := net.LookupIP(host)
@@ -31,7 +33,7 @@ func init_database() {
 		panic(err)
 	}
 	defer database.Close()
-	statement, err := database.Prepare("CREATE TABLE IF NOT EXISTS program (id INTEGER PRIMARY KEY, domain TEXT)")
+	statement, err := database.Prepare("CREATE TABLE IF NOT EXISTS program (id INTEGER PRIMARY KEY, domain TEXT, activo INTEGER)")
 	if err != nil {
 		panic(err)
 	}
@@ -40,25 +42,29 @@ func init_database() {
 	if err != nil {
 		panic(err)
 	}
+
 	statement.Exec()
+	statement, err = database.Prepare("INSERT INTO program (domain, activo) VALUES (?, ?)")
+	if err != nil {
+		panic(err)
+	}
+	statement.Exec("example.ec", 1)
 
 }
 
-func set_domain(id int) {
+func getdomain() {
 	database, err := sql.Open("sqlite3", "./data.db")
 	if err != nil {
 		panic(err)
 	}
 	defer database.Close()
-	rows, err := database.Query("SELECT domain FROM target WHERE id = ? LIMIT 1", id)
+	rows, err := database.Query("SELECT domain FROM program WHERE activo = 1 LIMIT 1")
 	if err != nil {
 		panic(err)
 	}
 	for rows.Next() {
-		rows.Scan(&d)
+		rows.Scan(&domain)
 	}
-	domain = d
-	print(domain)
 }
 
 func insertIps(subdomain string, ip string, port string) {
@@ -66,16 +72,67 @@ func insertIps(subdomain string, ip string, port string) {
 	if err != nil {
 		panic(err)
 	}
-	statement, err := database.Prepare("INSERT INTO targets (subdomain, ip, port) VALUES (?, ?, ?)")
+	statement, err := database.Prepare("INSERT INTO targets (subdomain, ip, port, activo) VALUES (?, ?, ?, ?)")
 	if err != nil {
 		panic(err)
 	}
-	statement.Exec(subdomain, ip, port)
+	statement.Exec(subdomain, ip, port, 1)
+}
+
+func setInactive(i string, j string) {
+	database, err := sql.Open("sqlite3", "./data.db")
+	if err != nil {
+		panic(err)
+	}
+	defer database.Close()
+	fmt.Println(i, j)
+	statement, err := database.Prepare("UPDATE targets SET activo = 0 WHERE subdomain = ? AND port = ?")
+	if err != nil {
+		panic(err)
+	}
+	statement.Exec(i, j)
+
+}
+
+func updateVulns(i string, j string, k string) {
+	database, err := sql.Open("sqlite3", "./data.db")
+	if err != nil {
+		panic(err)
+	}
+	defer database.Close()
+	statement, err := database.Prepare("UPDATE targets SET vuln = ? WHERE subdomain = ? AND port = ?")
+	if err != nil {
+		panic(err)
+	}
+	statement.Exec(i, j, k)
+
+}
+
+func scanVulns() {
+	cmd := exec.Command("nuclei", "-u", subdomain+":"+port, "--silent", "-c", "800", "-rl", "500", "-t", "/home/jorge/nuclei-templates/", "-json", "resultado.json") //nuclei --silent -c 800 -rl 500 -t /home/jorge/nuclei-templates/ -json resultado.json
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Fatal(err)
+	}
+	stringout := string(out)
+	var vulns []string = strings.Split(stringout, "\n")
+	for _, vuln := range vulns {
+		if vuln != "" {
+			fmt.Println(vuln)
+			updateVulns(vuln, subdomain, port)
+
+		}
+	}
 }
 
 func main() {
 	init_database()
-	//set_domain(1)
+	getdomain()
+	if domain == "" {
+		panic("No hay dominio activo")
+	}
+
+	fmt.Println(domain)
 	cmd := exec.Command("subfinder", "-d", domain, "-silent", "-oJ")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -139,7 +196,25 @@ func main() {
 			}
 
 		}
+
 	}
-	
+	fmt.Printf("%s:%s\n", subdomain, port)
+
+	//for results query sql
+	database, err := sql.Open("sqlite3", "./data.db")
+	if err != nil {
+		panic(err)
+	}
+	defer database.Close()
+	rows, err := database.Query("SELECT subdomain,port FROM targets WHERE activo = 1")
+	if err != nil {
+		panic(err)
+	}
+	for rows.Next() {
+		rows.Scan(&subdomain, &port)
+		fmt.Printf("%s:%s\n", subdomain, port)
+		scanVulns()
+		setInactive(subdomain, port)
+	}
 
 } // end main
