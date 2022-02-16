@@ -43,29 +43,25 @@ func ParserSubdomain(domain string, subdomain []string) {
 func ParserVuln(vulns []string) (vulnstring string) {
 	for _, vuln := range vulns {
 		if vuln != "" {
-			//string json to map
-			var data map[string]interface{}
-			err := json.Unmarshal([]byte(vuln), &data)
-			if err != nil {
-				panic(err)
-			}
-			//get data
-			//fmt.Println(data["extracted-results"])
-			//fmt.Println(data["info"])
-			r := data["extracted-results"]
-			result := fmt.Sprintf("%v", r)
-			i := data["info"]
-			info := fmt.Sprintf("%v", i)
+			//var data map[string]interface{}
+			//err := json.Unmarshal([]byte(vuln), &data)
+			//if err != nil {
+			//	panic(err)
+			//}
+			//r := data["extracted-results"]
+			//result := fmt.Sprintf("%v", r)
+			//i := data["info"]
+			//info := fmt.Sprintf("%v", i)
 			var vulnsall []string
-			vulnsall = append(vulnsall, result, info, "|")
+			vulnsall = append(vulnsall, vuln)
 			vulnstring = fmt.Sprintf("%v", vulnsall)
 			//fmt.Println(vulnstring)
 
 		}
 
 	}
-	vulnstring = strings.Replace(vulnstring, "[", "", -1)
-	vulnstring = strings.Replace(vulnstring, "]", "", -1)
-	vulnstring = strings.Replace(vulnstring, "reference:<nil>", "", -1)
+	//vulnstring = strings.Replace(vulnstring, "[", "", -1)
+	//vulnstring = strings.Replace(vulnstring, "]", "", -1)
+	//vulnstring = strings.Replace(vulnstring, "reference:<nil>", "", -1)
 	return vulnstring
 }

@@ -7,7 +7,7 @@ import (
 )
 
 func ProgBar() {
-	bar := progressbar.Default(int64(30))
+	bar := progressbar.Default(int64(100))
 	for i := 0; i < 120; i++ {
 		bar.Add(1)
 		time.Sleep(1 * time.Second)
