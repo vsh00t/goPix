@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 
 	_ "github.com/mattn/go-sqlite3" // sqlite3 driver
@@ -102,9 +101,46 @@ func InsertHosts(db *sql.DB, domain string, subdomain string, ip string, port st
 //function to update data
 func UpdateVuln(db *sql.DB, subdomain string, port string, vuln string) {
 	// Update data
-	fmt.Println("Insertando en " + subdomain + ":" + port + "La vulnerabilidad:" + vuln)
+	//fmt.Println("Insertando en " + subdomain + ":" + port + "La vulnerabilidad:" + vuln)
 	stmt, err := db.Prepare("UPDATE targets SET vuln = ?, activo = ? WHERE subdomain = ? AND port = ?")
 	CheckErr(err)
 	stmt.Exec(vuln, 0, subdomain, port)
 	defer db.Close()
+}
+
+func InsertDomain(db *sql.DB, domain string) {
+	stmt, err := db.Prepare("INSERT INTO program (domain, activo) values(?,?)")
+	CheckErr(err)
+	stmt.Exec(domain, 1)
+	defer db.Close()
+}
+
+func CuentaSubdomains(db *sql.DB, domain string) (count int) {
+	rows, err := db.Query("SELECT COUNT(DISTINCT subdomain) FROM targets where domain = ?", domain)
+	CheckErr(err)
+	for rows.Next() {
+		rows.Scan(&count)
+	}
+	defer db.Close()
+	return count
+}
+
+func CuentaAllSubdomains(db *sql.DB, domain string) (count int) {
+	rows, err := db.Query("SELECT COUNT(*) FROM targets where domain = ?", domain)
+	CheckErr(err)
+	for rows.Next() {
+		rows.Scan(&count)
+	}
+	defer db.Close()
+	return count
+}
+
+func CuentaProcSubdomains(db *sql.DB, domain string) (count int) {
+	rows, err := db.Query("SELECT COUNT(*) FROM targets where domain = ? AND activo = ?", domain, 1)
+	CheckErr(err)
+	for rows.Next() {
+		rows.Scan(&count)
+	}
+	defer db.Close()
+	return count
 }

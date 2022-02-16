@@ -2,6 +2,7 @@ package handler
 
 import (
 	"log"
+	"main/ui"
 	"os/exec"
 	"strings"
 )
@@ -16,6 +17,9 @@ func ListSubdomains(domain string) {
 	}
 	stringout := string(out)
 	subdomains = strings.Split(stringout, "\n")
+	count := len(subdomains)
+	ui.NumSubdomains(count - 1)
+	ui.InicioPorts()
 	ParserSubdomain(domain, subdomains)
 
 }

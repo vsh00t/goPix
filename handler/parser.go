@@ -43,7 +43,6 @@ func ParserSubdomain(domain string, subdomain []string) {
 func ParserVuln(vulns []string) (vulnstring string) {
 	for _, vuln := range vulns {
 		if vuln != "" {
-			fmt.Println("------")
 			//string json to map
 			var data map[string]interface{}
 			err := json.Unmarshal([]byte(vuln), &data)
@@ -61,7 +60,9 @@ func ParserVuln(vulns []string) (vulnstring string) {
 			vulnsall = append(vulnsall, result, info, "|")
 			vulnstring = fmt.Sprintf("%v", vulnsall)
 			//fmt.Println(vulnstring)
+
 		}
+
 	}
 	vulnstring = strings.Replace(vulnstring, "[", "", -1)
 	vulnstring = strings.Replace(vulnstring, "]", "", -1)

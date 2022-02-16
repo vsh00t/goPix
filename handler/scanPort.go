@@ -33,7 +33,8 @@ func scanPort(db *sql.DB, domain string, subdomain string, host string, ip strin
 			if !existe {
 				database.InsertHosts(database.ConnectDB(), domain, host, ip, port)
 			} else {
-				fmt.Println("ya existe")
+				//logging
+				log.Default()
 			}
 		}
 	}
