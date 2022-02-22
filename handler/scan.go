@@ -5,10 +5,11 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"main/database"
-	"main/ui"
 	"os/exec"
 	"strings"
+
+	"github.com/vsh00t/goPix/database"
+	"github.com/vsh00t/goPix/ui"
 )
 
 var nucleiTemplates string = "/home/jorge/nuclei-templates/"

@@ -6,9 +6,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"main/database"
 	"os/exec"
 	"strings"
+
+	"github.com/vsh00t/goPix/database"
 )
 
 func scanPort(db *sql.DB, domain string, subdomain string, host string, ip string) {

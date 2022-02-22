@@ -4,9 +4,10 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"main/database"
 	"net"
 	"strings"
+
+	"github.com/vsh00t/goPix/database"
 )
 
 func ParserSubdomain(domain string, subdomain []string) {

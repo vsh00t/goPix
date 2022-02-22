@@ -3,8 +3,9 @@ package handler
 
 import (
 	"fmt"
-	"main/database"
-	"main/ui"
+
+	"github.com/vsh00t/goPix/database"
+	"github.com/vsh00t/goPix/ui"
 )
 
 func CreateDomain() (domain string) {
