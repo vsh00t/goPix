@@ -3,10 +3,9 @@ package handler
 
 import (
 	"log"
+	"main/ui"
 	"os/exec"
 	"strings"
-
-	"github.com/vsh00t/goPix/ui"
 )
 
 var subdomains []string

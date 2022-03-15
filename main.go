@@ -2,11 +2,10 @@
 package main
 
 import (
+	"main/database"
+	"main/handler"
+	"main/ui"
 	"strings"
-
-	"github.com/vsh00t/goPix/database"
-	"github.com/vsh00t/goPix/handler"
-	"github.com/vsh00t/goPix/ui"
 )
 
 func main() {

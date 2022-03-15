@@ -4,12 +4,10 @@ package handler
 import (
 	"database/sql"
 	"fmt"
-	"log"
+	"main/database"
+	"main/ui"
+	"os"
 	"os/exec"
-	"strings"
-
-	"github.com/vsh00t/goPix/database"
-	"github.com/vsh00t/goPix/ui"
 )
 
 var nucleiTemplates string = "/home/jorge/nuclei-templates/"
@@ -18,18 +16,15 @@ func ScanVulns(db *sql.DB, subdomain string, port string, domain string) {
 	fmt.Println("")
 	fmt.Println("Escaneando", subdomain+":"+port)
 	fmt.Println("")
-	cmd := "echo " + subdomain + "| httpx --silent -ports " + port + " | nuclei --silent -c 800 -rl 500 -t " + nucleiTemplates + " -json resultado.json"
+	cmd := "echo " + subdomain + "| httpx --silent -rl 500 -ports " + port + " | nuclei --silent -rl 500 -c 800 -nts -t " + nucleiTemplates + " -o " + subdomain + "_" + port + ".txt"
 	ui.ProgBar()
-	out, err := exec.Command("/bin/bash", "-c", cmd).CombinedOutput()
+	exec.Command("/bin/bash", "-c", cmd).CombinedOutput()
+	//open file and show content
+	file := subdomain + "_" + port + ".txt"
+	dat, err := os.ReadFile(file)
 	if err != nil {
-		fmt.Println(err, "Error al escanear", subdomain+":"+port)
-		log.Fatal(err)
+		fmt.Println(err)
 	}
-	stringout := string(out)
-	var vulns []string = strings.Split(stringout, "\n")
-	//fmt.Println(vulns)
-	vulnstring := ParserVuln(vulns)
-	fmt.Printf("%s\n", vulnstring)
-	database.UpdateVuln(database.ConnectDB(), subdomain, port, vulnstring)
+	database.UpdateVuln(database.ConnectDB(), subdomain, port, string(dat))
 
 }
