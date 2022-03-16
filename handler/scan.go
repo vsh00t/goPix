@@ -10,14 +10,15 @@ import (
 	"os/exec"
 )
 
-var nucleiTemplates string = "/home/jorge/nuclei-templates/"
+var nucleiTemplates string = "/Users/moyapj/nuclei-templates"
 
 func ScanVulns(db *sql.DB, subdomain string, port string, domain string) {
 	fmt.Println("")
 	fmt.Println("Escaneando", subdomain+":"+port)
 	fmt.Println("")
-	cmd := "echo " + subdomain + "| httpx --silent -rl 500 -ports " + port + " | nuclei --silent -rl 500 -c 800 -nts -t " + nucleiTemplates + " -o " + subdomain + "_" + port + ".txt"
+	cmd := "echo " + subdomain + "| httpx --silent -rl 500 -ports " + port + " | nuclei --silent -rl 500 -c 800 -nts -t " + nucleiTemplates + " --json -o " + subdomain + "_" + port + ".txt"
 	ui.ProgBar()
+	//fmt.Printf(cmd)
 	exec.Command("/bin/bash", "-c", cmd).CombinedOutput()
 	//open file and show content
 	file := subdomain + "_" + port + ".txt"

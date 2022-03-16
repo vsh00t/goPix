@@ -19,3 +19,4 @@ main
 # Database
 *.db
 *.txt
+bin/

@@ -145,3 +145,13 @@ func CuentaProcSubdomains(db *sql.DB, domain string) (count int) {
 	defer db.Close()
 	return count
 }
+
+//function to update http 0 no http or https 1 https 2 http 3 http y https
+func UpdateHttp(db *sql.DB, subdomain string, port string, http int) {
+	// Update data
+	//fmt.Println("Insertando en " + subdomain + ":" + port + "La vulnerabilidad:" + vuln)
+	stmt, err := db.Prepare("UPDATE targets SET http = ? WHERE subdomain = ? AND port = ?")
+	CheckErr(err)
+	stmt.Exec(http, subdomain, port)
+	defer db.Close()
+}
