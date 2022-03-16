@@ -37,7 +37,7 @@ func InitDB(db *sql.DB) {
 	stmt, err := db.Prepare("CREATE TABLE IF NOT EXISTS program (id INTEGER PRIMARY KEY, domain TEXT, activo INTEGER)")
 	CheckErr(err)
 	stmt.Exec()
-	stmt, err = db.Prepare("CREATE TABLE IF NOT EXISTS targets (id INTEGER PRIMARY KEY, domain TEXT, subdomain TEXT, ip TEXT, port TEXT, vuln TEXT, activo INTEGER)")
+	stmt, err = db.Prepare("CREATE TABLE IF NOT EXISTS targets (id INTEGER PRIMARY KEY, domain TEXT, subdomain TEXT, ip TEXT, port TEXT, vuln TEXT, spider TEXT, http INT, activo INTEGER)")
 	CheckErr(err)
 	stmt.Exec()
 	defer db.Close()
